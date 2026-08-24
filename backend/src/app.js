@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes");
 const errorHandler = require("./middlewares/errorMiddleware");
+const notFoundMiddleware = require("./middlewares/notFoundMiddleware");
 
 const app = express();
 
@@ -17,6 +18,8 @@ app.get("/", (req, res) => {
         message: "Playlist+ API funcionando!"
     });
 });
+
+app.use(notFoundMiddleware);
 
 app.use(errorHandler);
 

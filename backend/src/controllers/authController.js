@@ -21,6 +21,19 @@ const register = async (req, res) => {
     });
 };
 
+const me = async (req, res, next) => {
+    try {
+        return res.status(200).json({
+            success: true,
+            message: "Usuário autenticado.",
+            userId: req.userId
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
-    register
+    register,
+    me
 };
