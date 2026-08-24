@@ -1,21 +1,8 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
+const { register } = require("../controllers/authController");
 
 const router = express.Router();
 
-router.post("/register", async (req, res) => {
-    const { name, email, password } = req.body;
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    res.status(201).json({
-        message: "Cadastro recebido com sucesso!",
-        user: {
-            name,
-            email,
-            passwordHash
-        }
-    });
-});
+router.post("/register", register);
 
 module.exports = router;
