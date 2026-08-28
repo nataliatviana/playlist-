@@ -7,8 +7,12 @@ const validateRegister = (name, email, password) => {
 
     if (!email || email.trim() === "") {
         errors.push("E-mail é obrigatório.");
-    } else if (!email.includes("@")) {
-        errors.push("E-mail inválido.");
+    } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            errors.push("E-mail inválido.");
+        }
     }
 
     if (!password || password.trim() === "") {
