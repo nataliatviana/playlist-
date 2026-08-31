@@ -24,6 +24,21 @@ const validateRegister = (name, email, password) => {
     return errors;
 };
 
+const validateLogin = (email, password) => {
+    const errors = [];
+
+    if (!email || email.trim() === "") {
+        errors.push("E-mail é obrigatório.");
+    }
+
+    if (!password || password.trim() === "") {
+        errors.push("Senha é obrigatória.");
+    }
+
+    return errors;
+};
+
 module.exports = {
-    validateRegister
+    validateRegister,
+    validateLogin
 };

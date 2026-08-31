@@ -1,5 +1,5 @@
-const { registerUser } = require("../services/authService");
-const { validateRegister } = require("../utils/validation");
+const { registerUser, loginUser } = require("../services/authService");
+const { validateRegister, validateLogin } = require("../utils/validation");
 
 const register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -18,7 +18,30 @@ const register = async (req, res) => {
 
     return res.status(201).json({
         success: true,
-        message: "Cadastro recebido com sucesso!",
+        message: "Cadastro realizado com sucesso!",
+        user
+    });
+};
+
+const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    const errors = validateLogin(email, password);
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Dados inválidos.",
+            errors
+        });
+    }
+
+    const { token, user } = await loginUser(email, password);
+
+    return res.status(200).json({
+        success: true,
+        message: "Login realizado com sucesso!",
+        token,
         user
     });
 };
@@ -33,5 +56,6 @@ const me = async (req, res) => {
 
 module.exports = {
     register,
+    login,
     me
 };
