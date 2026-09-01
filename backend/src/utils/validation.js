@@ -29,6 +29,12 @@ const validateLogin = (email, password) => {
 
     if (!email || email.trim() === "") {
         errors.push("E-mail é obrigatório.");
+    } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            errors.push("E-mail inválido.");
+        }
     }
 
     if (!password || password.trim() === "") {

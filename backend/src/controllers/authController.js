@@ -1,4 +1,4 @@
-const { registerUser, loginUser } = require("../services/authService");
+const { registerUser, loginUser, getUserById } = require("../services/authService");
 const { validateRegister, validateLogin } = require("../utils/validation");
 
 const register = async (req, res) => {
@@ -18,7 +18,7 @@ const register = async (req, res) => {
 
     return res.status(201).json({
         success: true,
-        message: "Cadastro realizado com sucesso!",
+        message: "Cadastro recebido com sucesso!",
         user
     });
 };
@@ -36,21 +36,22 @@ const login = async (req, res) => {
         });
     }
 
-    const { token, user } = await loginUser(email, password);
+    const result = await loginUser(email, password);
 
     return res.status(200).json({
         success: true,
         message: "Login realizado com sucesso!",
-        token,
-        user
+        token: result.token
     });
 };
 
 const me = async (req, res) => {
+    const user = await getUserById(req.userId);
+
     return res.status(200).json({
         success: true,
         message: "Usuário autenticado.",
-        userId: req.userId
+        user
     });
 };
 
