@@ -43,8 +43,21 @@ const validateLogin = (email, password) => {
 
     return errors;
 };
+const validateArtist = (name, bio) => {
+    const errors = [];
 
+    if (!name || name.trim() === "") {
+        errors.push("Nome do artista é obrigatório.");
+    }
+
+    if (bio !== undefined && bio !== null && typeof bio !== "string") {
+        errors.push("Biografia deve ser um texto.");
+    }
+
+    return errors;
+};
 module.exports = {
     validateRegister,
-    validateLogin
+    validateLogin,
+    validateArtist
 };
