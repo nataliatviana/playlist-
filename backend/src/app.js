@@ -8,6 +8,8 @@ const artistRoutes = require("./routes/artistRoutes");
 
 const albumRoutes = require("./routes/albumRoutes");
 
+const genreRoutes = require("./routes/genreRoutes");
+
 const errorHandler = require("./middlewares/errorMiddleware");
 
 const notFoundMiddleware = require("./middlewares/notFoundMiddleware");
@@ -23,6 +25,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/artists", artistRoutes);
 
 app.use("/api/albums", albumRoutes);
+
+app.use("/api/genres", genreRoutes);
 
 app.get("/", (req, res) => {
     res.json({
