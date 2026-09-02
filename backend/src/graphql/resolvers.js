@@ -1,3 +1,4 @@
+const { GraphQLError } = require("graphql");
 const Song = require("../models/Song");
 const Artist = require("../models/Artist");
 const Album = require("../models/Album");
@@ -26,6 +27,17 @@ const canManageSongs = (playlist, userId) =>
     playlist.collaborators.some((collaboratorId) =>
       isSameUser(collaboratorId, userId)
     ));
+
+const throwForbidden = (message) => {
+  throw new GraphQLError(message, {
+    extensions: {
+      code: "FORBIDDEN",
+      http: {
+        status: 403
+      }
+    }
+  });
+};
 
 const resolvers = {
   Query: {
@@ -79,7 +91,7 @@ const resolvers = {
         throw new Error("Playlist não encontrada");
       }
       if (!isOwner(playlist, userId)) {
-        throw new Error("Apenas o dono pode editar a playlist");
+        throwForbidden("Apenas o dono pode editar a playlist");
       }
 
       if (name !== undefined) playlist.name = name;
@@ -97,7 +109,7 @@ const resolvers = {
         throw new Error("Playlist não encontrada");
       }
       if (!isOwner(playlist, userId)) {
-        throw new Error("Apenas o dono pode excluir a playlist");
+          throwForbidden("Apenas o dono pode excluir a playlist");  
       }
 
       await playlist.deleteOne();
@@ -112,7 +124,7 @@ const resolvers = {
         throw new Error("Playlist não encontrada");
       }
       if (!canManageSongs(playlist, userId)) {
-        throw new Error("Você não tem permissão para alterar as músicas desta playlist");
+        throwForbidden("Você não tem permissão para alterar as músicas desta playlist");
       }
 
       const songExists = await Song.findById(musicaId);
@@ -138,7 +150,7 @@ const resolvers = {
         throw new Error("Playlist não encontrada");
       }
       if (!canManageSongs(playlist, userId)) {
-        throw new Error("Você não tem permissão para alterar as músicas desta playlist");
+        throwForbidden("Você não tem permissão para alterar as músicas desta playlist");
       }
 
       const musicaEstaNaPlaylist = playlist.songs.some(
@@ -162,7 +174,7 @@ const resolvers = {
         throw new Error("Playlist não encontrada");
       }
       if (!isOwner(playlist, authenticatedUserId)) {
-        throw new Error("Apenas o dono pode adicionar colaboradores");
+        throwForbidden("Apenas o dono pode adicionar colaboradores");
       }
       if (playlist.visibility !== "collaborative") {
         throw new Error("A playlist precisa ter visibilidade collaborative");
@@ -195,7 +207,7 @@ const resolvers = {
         throw new Error("Playlist não encontrada");
       }
       if (!isOwner(playlist, authenticatedUserId)) {
-        throw new Error("Apenas o dono pode remover colaboradores");
+        throwForbidden("Apenas o dono pode remover colaboradores");
       }
 
       const isCollaborator = playlist.collaborators.some((collaboratorId) =>
