@@ -49,9 +49,19 @@ const create = async (req, res) => {
 };
 
 const list = async (req, res) => {
-    const { search } = req.query;
+    const {
+        search,
+        genre,
+        artist,
+        album
+    } = req.query;
 
-    const songs = await getSongs(search);
+    const songs = await getSongs(
+        search,
+        genre,
+        artist,
+        album
+    );
 
     return res.status(200).json({
         success: true,

@@ -1,4 +1,7 @@
 const Song = require("../models/Song");
+const Artist = require("../models/Artist");
+const Album = require("../models/Album");
+const Genre = require("../models/Genre");
 
 const createSong = async (title, duration, artist, album, genre) => {
     const song = await Song.create({
@@ -12,13 +15,56 @@ const createSong = async (title, duration, artist, album, genre) => {
     return song;
 };
 
-const getSongs = async (search) => {
+const getSongs = async (search, genre, artist, album) => {
     const filter = {};
 
+    // Pesquisa por título
     if (search) {
         filter.title = {
             $regex: search,
             $options: "i"
+        };
+    }
+
+    // Filtro por gênero
+    if (genre) {
+        const genres = await Genre.find({
+            name: {
+                $regex: genre,
+                $options: "i"
+            }
+        }).select("_id");
+
+        filter.genre = {
+            $in: genres.map((item) => item._id)
+        };
+    }
+
+    // Filtro por artista
+    if (artist) {
+        const artists = await Artist.find({
+            name: {
+                $regex: artist,
+                $options: "i"
+            }
+        }).select("_id");
+
+        filter.artist = {
+            $in: artists.map((item) => item._id)
+        };
+    }
+
+    // Filtro por álbum
+    if (album) {
+        const albums = await Album.find({
+            title: {
+                $regex: album,
+                $options: "i"
+            }
+        }).select("_id");
+
+        filter.album = {
+            $in: albums.map((item) => item._id)
         };
     }
 
