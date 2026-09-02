@@ -43,6 +43,7 @@ const validateLogin = (email, password) => {
 
     return errors;
 };
+
 const validateArtist = (name, bio) => {
     const errors = [];
 
@@ -56,8 +57,32 @@ const validateArtist = (name, bio) => {
 
     return errors;
 };
+
+const validateAlbum = (title, releaseYear, artist) => {
+    const errors = [];
+
+    if (!title || title.trim() === "") {
+        errors.push("Título do álbum é obrigatório.");
+    }
+
+    if (
+        releaseYear !== undefined &&
+        releaseYear !== null &&
+        (typeof releaseYear !== "number" || !Number.isInteger(releaseYear))
+    ) {
+        errors.push("Ano de lançamento deve ser um número inteiro.");
+    }
+
+    if (!artist || artist.trim() === "") {
+        errors.push("Artista é obrigatório.");
+    }
+
+    return errors;
+};
+
 module.exports = {
     validateRegister,
     validateLogin,
-    validateArtist
+    validateArtist,
+    validateAlbum
 };
