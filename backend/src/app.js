@@ -1,45 +1,74 @@
 const express = require("express");
-
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const { ApolloServer } = require("@apollo/server");
+const { expressMiddleware } = require("@as-integrations/express5");
 
 const authRoutes = require("./routes/authRoutes");
-
 const artistRoutes = require("./routes/artistRoutes");
-
 const albumRoutes = require("./routes/albumRoutes");
-
 const genreRoutes = require("./routes/genreRoutes");
-
 const songRoutes = require("./routes/songRoutes");
 
 const errorHandler = require("./middlewares/errorMiddleware");
-
 const notFoundMiddleware = require("./middlewares/notFoundMiddleware");
+const typeDefs = require("./graphql/typeDefs");
+const resolvers = require("./graphql/resolvers");
 
-const app = express();
+const getGraphqlContext = ({ req }) => {
+    const authHeader = req.headers.authorization;
 
-app.use(cors());
+    if (!authHeader) {
+        return {};
+    }
 
-app.use(express.json());
+    const [scheme, token] = authHeader.split(" ");
 
-app.use("/api/auth", authRoutes);
+    if (scheme !== "Bearer" || !token) {
+        return {};
+    }
 
-app.use("/api/artists", artistRoutes);
+    try {
+        const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+        return { userId };
+    } catch {
+        return {};
+    }
+};
 
-app.use("/api/albums", albumRoutes);
+async function createApp() {
+    const app = express();
 
-app.use("/api/genres", genreRoutes);
+    app.use(cors());
+    app.use(express.json());
 
-app.use("/api/songs", songRoutes);
+    app.use("/api/auth", authRoutes);
+    app.use("/api/artists", artistRoutes);
+    app.use("/api/albums", albumRoutes);
+    app.use("/api/genres", genreRoutes);
+    app.use("/api/songs", songRoutes);
 
-app.get("/", (req, res) => {
-    res.json({
-        message: "Playlist+ API funcionando!"
+    app.get("/", (req, res) => {
+        res.json({
+            message: "Playlist+ API funcionando!"
+        });
     });
-});
 
-app.use(notFoundMiddleware);
+    const apolloServer = new ApolloServer({ typeDefs, resolvers });
 
-app.use(errorHandler);
+    await apolloServer.start();
 
-module.exports = app;
+    app.use(
+        "/graphql",
+        expressMiddleware(apolloServer, {
+            context: getGraphqlContext
+        })
+    );
+
+    app.use(notFoundMiddleware);
+    app.use(errorHandler);
+
+    return app;
+}
+
+module.exports = createApp;
