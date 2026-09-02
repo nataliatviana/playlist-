@@ -5,7 +5,9 @@ const {
     list,
     getById,
     update,
-    remove
+    remove,
+    albums,
+    songs
 } = require("../controllers/artistController");
 
 const router = express.Router();
@@ -13,6 +15,10 @@ const router = express.Router();
 router.post("/", create);
 
 router.get("/", list);
+
+router.get("/:id/albums", albums);
+
+router.get("/:id/songs", songs);
 
 router.get("/:id", getById);
 

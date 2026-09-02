@@ -3,7 +3,9 @@ const {
     getArtists,
     getArtistById,
     updateArtist,
-    deleteArtist
+    deleteArtist,
+    getAlbumsByArtist,
+    getSongsByArtist
 } = require("../services/artistService");
 
 const { validateArtist } = require("../utils/validation");
@@ -61,7 +63,11 @@ const update = async (req, res) => {
         });
     }
 
-    const artist = await updateArtist(req.params.id, name, bio);
+    const artist = await updateArtist(
+        req.params.id,
+        name,
+        bio
+    );
 
     return res.status(200).json({
         success: true,
@@ -80,10 +86,30 @@ const remove = async (req, res) => {
     });
 };
 
+const albums = async (req, res) => {
+    const albums = await getAlbumsByArtist(req.params.id);
+
+    return res.status(200).json({
+        success: true,
+        albums
+    });
+};
+
+const songs = async (req, res) => {
+    const songs = await getSongsByArtist(req.params.id);
+
+    return res.status(200).json({
+        success: true,
+        songs
+    });
+};
+
 module.exports = {
     create,
     list,
     getById,
     update,
-    remove
+    remove,
+    albums,
+    songs
 };

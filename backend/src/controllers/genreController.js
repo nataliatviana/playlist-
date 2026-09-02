@@ -3,7 +3,8 @@ const {
     getGenres,
     getGenreById,
     updateGenre,
-    deleteGenre
+    deleteGenre,
+    getSongsByGenre
 } = require("../services/genreService");
 
 const { validateGenre } = require("../utils/validation");
@@ -61,7 +62,10 @@ const update = async (req, res) => {
         });
     }
 
-    const genre = await updateGenre(req.params.id, name);
+    const genre = await updateGenre(
+        req.params.id,
+        name
+    );
 
     return res.status(200).json({
         success: true,
@@ -80,10 +84,20 @@ const remove = async (req, res) => {
     });
 };
 
+const songs = async (req, res) => {
+    const songs = await getSongsByGenre(req.params.id);
+
+    return res.status(200).json({
+        success: true,
+        songs
+    });
+};
+
 module.exports = {
     create,
     list,
     getById,
     update,
-    remove
+    remove,
+    songs
 };

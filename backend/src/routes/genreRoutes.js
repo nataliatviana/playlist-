@@ -5,7 +5,8 @@ const {
     list,
     getById,
     update,
-    remove
+    remove,
+    songs
 } = require("../controllers/genreController");
 
 const router = express.Router();
@@ -13,6 +14,8 @@ const router = express.Router();
 router.post("/", create);
 
 router.get("/", list);
+
+router.get("/:id/songs", songs);
 
 router.get("/:id", getById);
 

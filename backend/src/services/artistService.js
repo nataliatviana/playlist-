@@ -61,10 +61,35 @@ const deleteArtist = async (id) => {
     return artist;
 };
 
+const getAlbumsByArtist = async (artistId) => {
+    const Album = require("../models/Album");
+
+    const albums = await Album.find({
+        artist: artistId
+    }).populate("artist");
+
+    return albums;
+};
+
+const getSongsByArtist = async (artistId) => {
+    const Song = require("../models/Song");
+
+    const songs = await Song.find({
+        artist: artistId
+    })
+        .populate("artist")
+        .populate("album")
+        .populate("genre");
+
+    return songs;
+};
+
 module.exports = {
     createArtist,
     getArtists,
     getArtistById,
     updateArtist,
-    deleteArtist
+    deleteArtist,
+    getAlbumsByArtist,
+    getSongsByArtist
 };

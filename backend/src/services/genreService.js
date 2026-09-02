@@ -59,10 +59,24 @@ const deleteGenre = async (id) => {
     return genre;
 };
 
+const getSongsByGenre = async (genreId) => {
+    const Song = require("../models/Song");
+
+    const songs = await Song.find({
+        genre: genreId
+    })
+        .populate("artist")
+        .populate("album")
+        .populate("genre");
+
+    return songs;
+};
+
 module.exports = {
     createGenre,
     getGenres,
     getGenreById,
     updateGenre,
-    deleteGenre
+    deleteGenre,
+    getSongsByGenre
 };

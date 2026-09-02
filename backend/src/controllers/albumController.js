@@ -3,7 +3,8 @@ const {
     getAlbums,
     getAlbumById,
     updateAlbum,
-    deleteAlbum
+    deleteAlbum,
+    getSongsByAlbum
 } = require("../services/albumService");
 
 const { validateAlbum } = require("../utils/validation");
@@ -85,10 +86,20 @@ const remove = async (req, res) => {
     });
 };
 
+const songs = async (req, res) => {
+    const songs = await getSongsByAlbum(req.params.id);
+
+    return res.status(200).json({
+        success: true,
+        songs
+    });
+};
+
 module.exports = {
     create,
     list,
     getById,
     update,
-    remove
+    remove,
+    songs
 };
