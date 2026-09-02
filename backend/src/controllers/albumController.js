@@ -22,7 +22,11 @@ const create = async (req, res) => {
         });
     }
 
-    const album = await createAlbum(title, releaseYear, artist);
+    const album = await createAlbum(
+        title,
+        releaseYear,
+        artist
+    );
 
     return res.status(201).json({
         success: true,
@@ -32,7 +36,9 @@ const create = async (req, res) => {
 };
 
 const list = async (req, res) => {
-    const albums = await getAlbums();
+    const { search } = req.query;
+
+    const albums = await getAlbums(search);
 
     return res.status(200).json({
         success: true,

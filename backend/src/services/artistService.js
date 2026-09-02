@@ -9,8 +9,17 @@ const createArtist = async (name, bio) => {
     return artist;
 };
 
-const getArtists = async () => {
-    const artists = await Artist.find();
+const getArtists = async (search) => {
+    const filter = {};
+
+    if (search) {
+        filter.name = {
+            $regex: search,
+            $options: "i"
+        };
+    }
+
+    const artists = await Artist.find(filter);
 
     return artists;
 };

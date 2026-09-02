@@ -9,9 +9,21 @@ const {
 const { validateSong } = require("../utils/validation");
 
 const create = async (req, res) => {
-    const { title, duration, artist, album, genre } = req.body;
+    const {
+        title,
+        duration,
+        artist,
+        album,
+        genre
+    } = req.body;
 
-    const errors = validateSong(title, duration, artist, album, genre);
+    const errors = validateSong(
+        title,
+        duration,
+        artist,
+        album,
+        genre
+    );
 
     if (errors.length > 0) {
         return res.status(400).json({
@@ -37,7 +49,9 @@ const create = async (req, res) => {
 };
 
 const list = async (req, res) => {
-    const songs = await getSongs();
+    const { search } = req.query;
+
+    const songs = await getSongs(search);
 
     return res.status(200).json({
         success: true,
@@ -55,9 +69,21 @@ const getById = async (req, res) => {
 };
 
 const update = async (req, res) => {
-    const { title, duration, artist, album, genre } = req.body;
+    const {
+        title,
+        duration,
+        artist,
+        album,
+        genre
+    } = req.body;
 
-    const errors = validateSong(title, duration, artist, album, genre);
+    const errors = validateSong(
+        title,
+        duration,
+        artist,
+        album,
+        genre
+    );
 
     if (errors.length > 0) {
         return res.status(400).json({

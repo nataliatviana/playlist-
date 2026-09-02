@@ -10,8 +10,17 @@ const createAlbum = async (title, releaseYear, artist) => {
     return album;
 };
 
-const getAlbums = async () => {
-    const albums = await Album.find()
+const getAlbums = async (search) => {
+    const filter = {};
+
+    if (search) {
+        filter.title = {
+            $regex: search,
+            $options: "i"
+        };
+    }
+
+    const albums = await Album.find(filter)
         .populate("artist");
 
     return albums;

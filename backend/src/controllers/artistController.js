@@ -33,7 +33,9 @@ const create = async (req, res) => {
 };
 
 const list = async (req, res) => {
-    const artists = await getArtists();
+    const { search } = req.query;
+
+    const artists = await getArtists(search);
 
     return res.status(200).json({
         success: true,

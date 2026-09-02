@@ -1,35 +1,6 @@
 const Song = require("../models/Song");
-const Artist = require("../models/Artist");
-const Album = require("../models/Album");
-const Genre = require("../models/Genre");
 
 const createSong = async (title, duration, artist, album, genre) => {
-    const artistExists = await Artist.findById(artist);
-
-    if (!artistExists) {
-        const error = new Error("Artista não encontrado.");
-        error.status = 404;
-        throw error;
-    }
-
-    if (album) {
-        const albumExists = await Album.findById(album);
-
-        if (!albumExists) {
-            const error = new Error("Álbum não encontrado.");
-            error.status = 404;
-            throw error;
-        }
-    }
-
-    const genreExists = await Genre.findById(genre);
-
-    if (!genreExists) {
-        const error = new Error("Gênero não encontrado.");
-        error.status = 404;
-        throw error;
-    }
-
     const song = await Song.create({
         title,
         duration,
@@ -41,8 +12,17 @@ const createSong = async (title, duration, artist, album, genre) => {
     return song;
 };
 
-const getSongs = async () => {
-    const songs = await Song.find()
+const getSongs = async (search) => {
+    const filter = {};
+
+    if (search) {
+        filter.title = {
+            $regex: search,
+            $options: "i"
+        };
+    }
+
+    const songs = await Song.find(filter)
         .populate("artist")
         .populate("album")
         .populate("genre");
@@ -65,33 +45,14 @@ const getSongById = async (id) => {
     return song;
 };
 
-const updateSong = async (id, title, duration, artist, album, genre) => {
-    const artistExists = await Artist.findById(artist);
-
-    if (!artistExists) {
-        const error = new Error("Artista não encontrado.");
-        error.status = 404;
-        throw error;
-    }
-
-    if (album) {
-        const albumExists = await Album.findById(album);
-
-        if (!albumExists) {
-            const error = new Error("Álbum não encontrado.");
-            error.status = 404;
-            throw error;
-        }
-    }
-
-    const genreExists = await Genre.findById(genre);
-
-    if (!genreExists) {
-        const error = new Error("Gênero não encontrado.");
-        error.status = 404;
-        throw error;
-    }
-
+const updateSong = async (
+    id,
+    title,
+    duration,
+    artist,
+    album,
+    genre
+) => {
     const song = await Song.findByIdAndUpdate(
         id,
         {
