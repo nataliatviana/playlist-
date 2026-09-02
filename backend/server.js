@@ -1,11 +1,13 @@
 require("dotenv").config();
 
-const app = require("./src/app");
+const createApp = require("./src/app");
 const connectDatabase = require("./src/config/database");
 
 const PORT = process.env.PORT || 3000;
 
-connectDatabase().then(() => {
+connectDatabase().then(async () => {
+    const app = await createApp();
+
     app.listen(PORT, () => {
         console.log(`Servidor rodando na porta ${PORT}`);
     });
