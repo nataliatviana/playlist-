@@ -586,15 +586,36 @@ As funcionalidades de playlist são implementadas utilizando os recursos dispon�
 
 # 🚀 GraphQL
 
-O projeto possui integração com GraphQL utilizando Apollo Server.
+O projeto possui integração com **GraphQL** utilizando **Apollo Server**.
 
-O endpoint GraphQL é:
+Diferentemente da API REST, que possui uma rota diferente para cada recurso, o GraphQL utiliza **uma única rota** para realizar as consultas e alterações:
 
 ```text
 http://localhost:3000/graphql
 ```
 
-O GraphQL utiliza os tipos e resolvers definidos na pasta:
+Por exemplo, na API REST temos rotas diferentes:
+
+```text
+GET /api/songs
+GET /api/artists
+GET /api/albums
+GET /api/genres
+```
+
+No GraphQL, todas essas operações são realizadas através de:
+
+```text
+POST /graphql
+```
+
+O que muda é o conteúdo enviado na requisição. Dentro dela, informamos **qual informação queremos consultar ou alterar**.
+
+---
+
+## 📁 Arquivos do GraphQL
+
+A implementação do GraphQL está localizada em:
 
 ```text
 src/graphql
@@ -607,7 +628,561 @@ src/graphql/typeDefs.js
 src/graphql/resolvers.js
 ```
 
+### `typeDefs.js`
+
+O arquivo `typeDefs.js` define o **schema do GraphQL**.
+
+Ele informa quais operações podem ser realizadas e quais dados podem ser solicitados.
+
+De forma simplificada, podemos pensar no `typeDefs.js` como o **contrato da API GraphQL**.
+
+É nele que ficam definidos conceitos como:
+
+```text
+Query
+Mutation
+Song
+Artist
+Album
+Genre
+```
+
+Os nomes exatos das operações disponíveis devem ser consultados nesse arquivo.
+
 ---
+
+### `resolvers.js`
+
+O arquivo `resolvers.js` contém a implementação das operações definidas no schema.
+
+Enquanto o `typeDefs.js` informa:
+
+> "Essa consulta existe."
+
+O `resolvers.js` informa:
+
+> "É assim que essa consulta será executada."
+
+O resolver normalmente acessa os models e serviços da aplicação para buscar ou alterar os dados no MongoDB.
+
+---
+
+# 🧪 Como acessar o GraphQL
+
+Com o projeto executando:
+
+```bash
+npm run dev
+```
+
+acesse:
+
+```text
+http://localhost:3000/graphql
+```
+
+O Apollo Server disponibiliza uma interface onde é possível escrever e executar consultas GraphQL.
+
+Essa interface facilita os testes porque permite visualizar as operações disponíveis e executar as consultas diretamente no navegador.
+
+---
+
+# 🔎 Como funcionam as consultas no GraphQL
+
+No GraphQL, uma consulta é chamada de **Query**.
+
+Uma Query é utilizada quando queremos **buscar informações**.
+
+Por exemplo, podemos ter consultas relacionadas a:
+
+```text
+Músicas
+Artistas
+Álbuns
+Gêneros
+```
+
+A principal diferença em relação ao REST é que não precisamos criar uma URL diferente para cada consulta.
+
+No REST:
+
+```http
+GET /api/songs
+```
+
+No GraphQL:
+
+```http
+POST /graphql
+```
+
+E dentro do corpo da requisição informamos qual informação queremos:
+
+```graphql
+query {
+  songs {
+    title
+  }
+}
+```
+
+> O nome `songs` acima é um exemplo de como uma Query pode ser estruturada. Para utilizar o nome correto no Playlist+, consulte as operações definidas em `src/graphql/typeDefs.js`.
+
+---
+
+# 🎵 Pesquisa de músicas
+
+A pesquisa de músicas no GraphQL funciona através de uma **Query** que recebe os parâmetros definidos no schema.
+
+A ideia é semelhante à pesquisa REST:
+
+```http
+GET /api/songs?search=summer
+```
+
+No GraphQL, em vez de colocar `search=summer` na URL, o valor é enviado como argumento da Query.
+
+Exemplo conceitual:
+
+```graphql
+query {
+  songs(search: "summer") {
+    title
+  }
+}
+```
+
+Nesse exemplo:
+
+```text
+songs
+```
+
+representa a consulta de músicas.
+
+```text
+search: "summer"
+```
+
+representa o termo pesquisado.
+
+```text
+title
+```
+
+indica que queremos receber o título das músicas encontradas.
+
+O GraphQL permite ainda escolher exatamente quais campos queremos receber.
+
+Por exemplo:
+
+```graphql
+query {
+  songs(search: "summer") {
+    title
+    duration
+  }
+}
+```
+
+Nesse caso, a resposta pode conter somente:
+
+```text
+title
+duration
+```
+
+Isso evita receber informações que não são necessárias.
+
+> A sintaxe e os argumentos disponíveis devem seguir exatamente o que estiver definido em `typeDefs.js`.
+
+---
+
+# 🎤 Pesquisa de artistas
+
+A mesma lógica pode ser utilizada para pesquisar artistas.
+
+No REST, a aplicação possui:
+
+```http
+GET /api/artists?search=nome
+```
+
+No GraphQL, a pesquisa é realizada através de uma Query dentro de:
+
+```text
+http://localhost:3000/graphql
+```
+
+Exemplo conceitual:
+
+```graphql
+query {
+  artists(search: "nome") {
+    name
+  }
+}
+```
+
+Nesse exemplo, estamos solicitando artistas que correspondam ao termo pesquisado.
+
+Também podemos solicitar outros campos disponíveis no schema.
+
+Por exemplo:
+
+```graphql
+query {
+  artists(search: "nome") {
+    name
+    id
+  }
+}
+```
+
+O ponto importante é que **os campos disponíveis precisam existir no tipo `Artist` definido em `typeDefs.js`**.
+
+---
+
+# 💿 Pesquisa de álbuns
+
+Na API REST, a pesquisa de álbuns pode ser realizada através de:
+
+```http
+GET /api/albums?search=titulo
+```
+
+No GraphQL, a ideia é semelhante.
+
+Exemplo conceitual:
+
+```graphql
+query {
+  albums(search: "titulo") {
+    title
+  }
+}
+```
+
+Podemos solicitar outros dados do álbum, caso estejam definidos no schema:
+
+```graphql
+query {
+  albums(search: "titulo") {
+    title
+    id
+  }
+}
+```
+
+Novamente, os nomes dos campos devem ser conferidos em:
+
+```text
+src/graphql/typeDefs.js
+```
+
+---
+
+# 🎼 Pesquisa de gêneros
+
+Também é possível consultar gêneros através do GraphQL caso essa operação esteja definida no schema.
+
+Exemplo conceitual:
+
+```graphql
+query {
+  genres {
+    name
+  }
+}
+```
+
+A consulta retorna os gêneros disponíveis e permite solicitar somente os campos necessários.
+
+---
+
+# 🎧 Pesquisas e relacionamentos
+
+Uma das principais vantagens do GraphQL é poder solicitar informações relacionadas em uma única consulta.
+
+No Playlist+, existem relacionamentos entre:
+
+```text
+Artista
+ ├── Álbuns
+ └── Músicas
+
+Álbum
+ └── Músicas
+
+Gênero
+ └── Músicas
+```
+
+Uma música possui referências para:
+
+```text
+Artista
+Álbum
+Gênero
+```
+
+No GraphQL, caso esses relacionamentos estejam definidos no schema, podemos solicitar os dados relacionados dentro da mesma consulta.
+
+Por exemplo, uma consulta pode seguir este conceito:
+
+```graphql
+query {
+  songs {
+    title
+    artist {
+      name
+    }
+    album {
+      title
+    }
+    genre {
+      name
+    }
+  }
+}
+```
+
+Assim, em uma única consulta, podemos solicitar:
+
+```text
+Nome da música
+    ↓
+Artista
+    ↓
+Álbum
+    ↓
+Gênero
+```
+
+Isso é uma das principais diferenças em relação a uma API REST tradicional, onde muitas vezes seriam necessárias várias requisições para obter informações relacionadas.
+
+> O exemplo acima representa a estrutura conceitual. Os nomes dos campos e relacionamentos devem corresponder exatamente ao schema definido no projeto.
+
+---
+
+# ✏️ Mutations
+
+Enquanto as **Queries** são utilizadas para consultar dados, as **Mutations** são utilizadas para realizar alterações.
+
+Por exemplo:
+
+```text
+Criar
+Atualizar
+Excluir
+```
+
+Uma Mutation também é enviada para:
+
+```text
+POST /graphql
+```
+
+Por exemplo, conceitualmente:
+
+```graphql
+mutation {
+  createSong(...) {
+    title
+  }
+}
+```
+
+Nesse caso, estamos solicitando a criação de uma música.
+
+Da mesma forma, podem existir mutations para:
+
+```text
+Criar música
+Atualizar música
+Excluir música
+
+Criar artista
+Atualizar artista
+Excluir artista
+
+Criar álbum
+Atualizar álbum
+Excluir álbum
+
+Criar gênero
+Atualizar gênero
+Excluir gênero
+```
+
+Os nomes exatos dessas mutations devem ser consultados em:
+
+```text
+src/graphql/typeDefs.js
+```
+
+---
+
+# 🧑‍💻 Como fazer uma consulta no Apollo Server
+
+Para testar uma operação:
+
+### 1. Inicie o projeto
+
+```bash
+npm run dev
+```
+
+### 2. Abra o GraphQL
+
+Acesse:
+
+```text
+http://localhost:3000/graphql
+```
+
+### 3. Verifique as operações disponíveis
+
+O Apollo Server permite consultar o schema para descobrir:
+
+```text
+Queries disponíveis
+Mutations disponíveis
+Tipos
+Argumentos
+Campos
+```
+
+Isso é importante porque o GraphQL é **fortemente tipado**.
+
+Ou seja, não podemos simplesmente inventar uma Query ou um campo.
+
+Se o schema não possuir:
+
+```graphql
+songs
+```
+
+por exemplo, essa consulta não funcionará.
+
+---
+
+# 📌 GraphQL x REST
+
+No Playlist+, as duas abordagens podem ser entendidas da seguinte forma:
+
+| REST                               | GraphQL                             |
+| ---------------------------------- | ----------------------------------- |
+| Possui várias rotas                | Utiliza uma rota principal          |
+| `/api/songs`                       | `/graphql`                          |
+| `/api/artists`                     | `/graphql`                          |
+| `/api/albums`                      | `/graphql`                          |
+| `/api/genres`                      | `/graphql`                          |
+| Parâmetros geralmente ficam na URL | Argumentos ficam na Query           |
+| Resposta definida pelo endpoint    | Cliente escolhe os campos desejados |
+| GET para consultas                 | Query para consultas                |
+| POST/PUT/DELETE para alterações    | Mutation para alterações            |
+
+### Exemplo REST
+
+Para buscar músicas:
+
+```http
+GET http://localhost:3000/api/songs
+```
+
+Para pesquisar músicas:
+
+```http
+GET http://localhost:3000/api/songs?search=summer
+```
+
+### Exemplo GraphQL
+
+Para ambas as operações, utilizamos:
+
+```http
+POST http://localhost:3000/graphql
+```
+
+E informamos no corpo da requisição o que queremos consultar.
+
+---
+
+# 🔍 Como descobrir as "rotas" disponíveis no GraphQL
+
+É importante entender que **GraphQL não possui uma rota específica para músicas, outra para artistas e outra para álbuns**.
+
+Existe apenas:
+
+```text
+http://localhost:3000/graphql
+```
+
+Dentro dessa rota existem diferentes **operações**.
+
+Para descobrir quais operações o Playlist+ realmente disponibiliza:
+
+1. Abra:
+
+```text
+src/graphql/typeDefs.js
+```
+
+2. Procure por:
+
+```graphql
+type Query
+```
+
+3. As operações dentro de `type Query` são as consultas disponíveis.
+
+4. Depois procure por:
+
+```graphql
+type Mutation
+```
+
+5. As operações dentro de `type Mutation` são as alterações disponíveis.
+
+Por exemplo, se o schema possuir:
+
+```graphql
+type Query {
+  songs: [Song]
+  artists: [Artist]
+  albums: [Album]
+}
+```
+
+significa que existem consultas para:
+
+```text
+songs
+artists
+albums
+```
+
+Todas elas, entretanto, são acessadas através de:
+
+```text
+POST /graphql
+```
+
+Da mesma forma, se existir:
+
+```graphql
+type Mutation {
+  createSong(...): Song
+  updateSong(...): Song
+  deleteSong(...): Song
+}
+```
+
+essas são as operações responsáveis pelas alterações.
+
+---
+
 
 # ⚠️ Tratamento de erros
 
