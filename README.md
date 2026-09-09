@@ -330,173 +330,307 @@ Isso significa que o servidor está funcionando corretamente.
 
 ---
 
-# 8. 🧪 Testando a API pelo Postman
+# 8. 🔎 Pesquisa e rotas da API
 
-O Postman pode ser utilizado para testar todos os endpoints da aplicação.
+A API do **Playlist+** disponibiliza endpoints RESTful para gerenciamento de usuários, artistas, álbuns, gêneros e músicas.
 
-A URL base da API é:
+Todas as rotas REST possuem como endereço base:
 
 ```text
-http://localhost:3000
+http://localhost:3000/api
+```
+
+As requisições são organizadas de acordo com o recurso que será manipulado.
+
+---
+
+## 🔐 Autenticação
+
+As rotas relacionadas aos usuários e autenticação estão disponíveis em:
+
+```text
+/api/auth
+```
+
+### Rotas disponíveis
+
+| Método | Rota                 | Descrição                               | Autenticação |
+| ------ | -------------------- | --------------------------------------- | ------------ |
+| `POST` | `/api/auth/register` | Cadastra um novo usuário                | Não          |
+| `POST` | `/api/auth/login`    | Realiza o login e gera um token JWT     | Não          |
+| `GET`  | `/api/auth/me`       | Retorna os dados do usuário autenticado | Sim          |
+
+### `POST /api/auth/register`
+
+Realiza o cadastro de um novo usuário.
+
+**Dados recebidos no corpo da requisição:**
+
+```text
+name
+email
+password
 ```
 
 ---
 
-# 🎼 Gêneros
+### `POST /api/auth/login`
 
-## Listar gêneros
+Realiza a autenticação do usuário.
 
-```http
-GET /api/genres
-```
-
-URL:
+**Dados recebidos no corpo da requisição:**
 
 ```text
-http://localhost:3000/api/genres
+email
+password
 ```
 
-Os gêneros possuem operações de:
+Após o login, a API retorna um **token JWT**, utilizado para acessar recursos que exigem autenticação.
 
-- POST
-- GET
-- GET por ID
-- PUT
-- DELETE
+---
+
+### `GET /api/auth/me`
+
+Retorna os dados do usuário atualmente autenticado.
+
+Essa rota exige o envio do token JWT através do cabeçalho:
+
+```text
+Authorization: Bearer SEU_TOKEN
+```
 
 ---
 
 # 🎤 Artistas
 
-## Listar artistas
-
-```http
-GET /api/artists
-```
-
-URL:
+As rotas relacionadas aos artistas estão disponíveis em:
 
 ```text
-http://localhost:3000/api/artists
+/api/artists
 ```
 
-Os artistas possuem operações de:
+### Rotas disponíveis
 
-- POST
-- GET
-- GET por ID
-- PUT
-- DELETE
+| Método   | Rota                      | Descrição                      |
+| -------- | ------------------------- | ------------------------------ |
+| `POST`   | `/api/artists`            | Cadastra um artista            |
+| `GET`    | `/api/artists`            | Lista os artistas              |
+| `GET`    | `/api/artists/:id`        | Busca um artista pelo ID       |
+| `PUT`    | `/api/artists/:id`        | Atualiza um artista            |
+| `DELETE` | `/api/artists/:id`        | Exclui um artista              |
+| `GET`    | `/api/artists/:id/albums` | Lista os álbuns de um artista  |
+| `GET`    | `/api/artists/:id/songs`  | Lista as músicas de um artista |
+
+### Pesquisa de artistas
+
+A listagem de artistas possui um parâmetro opcional de pesquisa:
+
+```text
+GET /api/artists?search=termo
+```
+
+O parâmetro `search` permite pesquisar artistas de acordo com o termo informado.
+
+### Dados para criação e atualização
+
+As operações `POST` e `PUT` utilizam:
+
+```text
+name
+bio
+```
 
 ---
 
 # 💿 Álbuns
 
-## Listar álbuns
-
-```http
-GET /api/albums
-```
-
-URL:
+As rotas relacionadas aos álbuns estão disponíveis em:
 
 ```text
-http://localhost:3000/api/albums
+/api/albums
 ```
 
-Os álbuns possuem operações de:
+### Rotas disponíveis
 
-- POST
-- GET
-- GET por ID
-- PUT
-- DELETE
+| Método   | Rota                    | Descrição                    |
+| -------- | ----------------------- | ---------------------------- |
+| `POST`   | `/api/albums`           | Cadastra um álbum            |
+| `GET`    | `/api/albums`           | Lista os álbuns              |
+| `GET`    | `/api/albums/:id`       | Busca um álbum pelo ID       |
+| `PUT`    | `/api/albums/:id`       | Atualiza um álbum            |
+| `DELETE` | `/api/albums/:id`       | Exclui um álbum              |
+| `GET`    | `/api/albums/:id/songs` | Lista as músicas de um álbum |
+
+### Pesquisa de álbuns
+
+A listagem de álbuns possui um parâmetro opcional de pesquisa:
+
+```text
+GET /api/albums?search=termo
+```
+
+O parâmetro `search` permite pesquisar álbuns pelo termo informado.
+
+### Dados para criação e atualização
+
+As operações `POST` e `PUT` utilizam:
+
+```text
+title
+releaseYear
+artist
+```
+
+O campo `artist` corresponde ao identificador do artista relacionado ao álbum.
+
+---
+
+# 🎼 Gêneros
+
+As rotas relacionadas aos gêneros musicais estão disponíveis em:
+
+```text
+/api/genres
+```
+
+### Rotas disponíveis
+
+| Método   | Rota                    | Descrição                     |
+| -------- | ----------------------- | ----------------------------- |
+| `POST`   | `/api/genres`           | Cadastra um gênero            |
+| `GET`    | `/api/genres`           | Lista os gêneros              |
+| `GET`    | `/api/genres/:id`       | Busca um gênero pelo ID       |
+| `PUT`    | `/api/genres/:id`       | Atualiza um gênero            |
+| `DELETE` | `/api/genres/:id`       | Exclui um gênero              |
+| `GET`    | `/api/genres/:id/songs` | Lista as músicas de um gênero |
+
+### Dados para criação e atualização
+
+As operações `POST` e `PUT` utilizam:
+
+```text
+name
+```
 
 ---
 
 # 🎵 Músicas
 
-## Listar músicas
-
-```http
-GET /api/songs
-```
-
-URL:
+As rotas relacionadas às músicas estão disponíveis em:
 
 ```text
-http://localhost:3000/api/songs
+/api/songs
 ```
 
-As músicas possuem operações de:
+### Rotas disponíveis
 
-- POST
-- GET
-- GET por ID
-- PUT
-- DELETE
+| Método   | Rota             | Descrição                |
+| -------- | ---------------- | ------------------------ |
+| `POST`   | `/api/songs`     | Cadastra uma música      |
+| `GET`    | `/api/songs`     | Lista as músicas         |
+| `GET`    | `/api/songs/:id` | Busca uma música pelo ID |
+| `PUT`    | `/api/songs/:id` | Atualiza uma música      |
+| `DELETE` | `/api/songs/:id` | Exclui uma música        |
+
+### Pesquisa e filtros de músicas
+
+A rota de listagem de músicas possui quatro parâmetros opcionais:
+
+```text
+GET /api/songs?search=termo
+GET /api/songs?genre=ID
+GET /api/songs?artist=ID
+GET /api/songs?album=ID
+```
+
+Também é possível utilizar mais de um filtro na mesma requisição:
+
+```text
+GET /api/songs?search=termo&genre=ID&artist=ID&album=ID
+```
+
+Os parâmetros disponíveis são:
+
+| Parâmetro | Função                                |
+| --------- | ------------------------------------- |
+| `search`  | Pesquisa músicas pelo termo informado |
+| `genre`   | Filtra músicas por gênero             |
+| `artist`  | Filtra músicas por artista            |
+| `album`   | Filtra músicas por álbum              |
+
+### Dados para criação e atualização
+
+As operações `POST` e `PUT` utilizam:
+
+```text
+title
+duration
+artist
+album
+genre
+```
+
+Os campos `artist`, `album` e `genre` representam os identificadores dos registros relacionados.
 
 ---
 
-# 🔎 Pesquisa
+# 🏠 Rota principal
 
-A API permite pesquisar conteúdos do catálogo pelo nome ou título.
-
-## Pesquisa de músicas
-
-Exemplo:
-
-```http
-GET /api/songs?search=summer
-```
-
-URL:
+Além das rotas dos recursos, a API possui uma rota inicial:
 
 ```text
-http://localhost:3000/api/songs?search=summer
+GET /
 ```
 
-A pesquisa permite localizar músicas de acordo com o termo informado.
+Essa rota pode ser utilizada para verificar se a API está funcionando corretamente.
 
-## Pesquisa de artistas
-
-```http
-GET /api/artists?search=nome
-```
-
-## Pesquisa de álbuns
-
-```http
-GET /api/albums?search=titulo
-```
+Quando acessada, retorna uma mensagem indicando que a **Playlist+ API está funcionando**.
 
 ---
 
-# 🎧 Filtros de músicas
+# 📊 Resumo de todas as rotas REST
 
-As músicas podem ser filtradas por:
+Abaixo estão reunidas **todas as rotas REST implementadas no backend**:
 
-- gênero;
-- artista;
-- álbum.
-
-## Filtrar por gênero
-
-Exemplo:
-
-```http
-GET /api/songs?genre=Rock
-```
-
-URL:
-
-```text
-http://localhost:3000/api/songs?genre=Rock
-```
-
-Também podem ser utilizados os filtros correspondentes a artista e álbum.
+| Método   | Endpoint                  | Função                           |
+| -------- | ------------------------- | -------------------------------- |
+| `GET`    | `/`                       | Verifica o funcionamento da API  |
+| `POST`   | `/api/auth/register`      | Cadastro de usuário              |
+| `POST`   | `/api/auth/login`         | Login                            |
+| `GET`    | `/api/auth/me`            | Dados do usuário autenticado     |
+| `POST`   | `/api/artists`            | Criar artista                    |
+| `GET`    | `/api/artists`            | Listar/pesquisar artistas        |
+| `GET`    | `/api/artists/:id`        | Buscar artista                   |
+| `PUT`    | `/api/artists/:id`        | Atualizar artista                |
+| `DELETE` | `/api/artists/:id`        | Excluir artista                  |
+| `GET`    | `/api/artists/:id/albums` | Álbuns do artista                |
+| `GET`    | `/api/artists/:id/songs`  | Músicas do artista               |
+| `POST`   | `/api/albums`             | Criar álbum                      |
+| `GET`    | `/api/albums`             | Listar/pesquisar álbuns          |
+| `GET`    | `/api/albums/:id`         | Buscar álbum                     |
+| `PUT`    | `/api/albums/:id`         | Atualizar álbum                  |
+| `DELETE` | `/api/albums/:id`         | Excluir álbum                    |
+| `GET`    | `/api/albums/:id/songs`   | Músicas do álbum                 |
+| `POST`   | `/api/genres`             | Criar gênero                     |
+| `GET`    | `/api/genres`             | Listar gêneros                   |
+| `GET`    | `/api/genres/:id`         | Buscar gênero                    |
+| `PUT`    | `/api/genres/:id`         | Atualizar gênero                 |
+| `DELETE` | `/api/genres/:id`         | Excluir gênero                   |
+| `GET`    | `/api/genres/:id/songs`   | Músicas do gênero                |
+| `POST`   | `/api/songs`              | Criar música                     |
+| `GET`    | `/api/songs`              | Listar/pesquisar/filtrar músicas |
+| `GET`    | `/api/songs/:id`          | Buscar música                    |
+| `PUT`    | `/api/songs/:id`          | Atualizar música                 |
+| `DELETE` | `/api/songs/:id`          | Excluir música                   |
 
 ---
+
+# 📝 Observação
+
+A API RESTful é responsável principalmente pelas operações de **CRUD e pesquisa** de usuários, artistas, álbuns, gêneros e músicas.
+
+Já o GraphQL amplia as funcionalidades do sistema, permitindo operações relacionadas a **playlists, favoritos, avaliações, colaboradores e consultas personalizadas**, utilizando uma única rota `/graphql`.
+
 
 # 🔗 Relacionamentos do catálogo
 
