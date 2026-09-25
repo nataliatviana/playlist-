@@ -1442,50 +1442,6 @@ Depois tente novamente:
 npm run dev
 ```
 
----
-
-## Erro de conexão com MongoDB Atlas
-
-Exemplo:
-
-```text
-MongooseServerSelectionError
-```
-
-Verifique:
-
-1. Se o MongoDB Atlas está funcionando.
-2. Se o usuário e senha do banco estão corretos.
-3. Se a connection string está correta.
-4. Se o IP do computador está cadastrado no **IP Access List**.
-5. Se o arquivo `.env` está configurado corretamente.
-6. Se você está em uma **rede corporativa**: firewalls com inspeção SSL podem bloquear a porta `27017` ou fazer o tráfego sair por outro IP público. Nesse caso, peça a liberação da porta `27017` para `*.mongodb.net` (sem inspeção TLS) ou use **Allow Access from Anywhere (`0.0.0.0/0`)** no Network Access do Atlas.
-
----
-
-## O servidor não inicia
-
-Verifique se:
-
-- as dependências foram instaladas;
-- o arquivo `.env` está configurado;
-- o MongoDB Atlas permite o acesso do seu IP;
-- a porta utilizada pela aplicação não está sendo utilizada por outro processo.
-
-Tente:
-
-```bash
-npm install
-```
-
-Depois:
-
-```bash
-npm run dev
-```
-
----
-
 # 🎨 Frontend (React + Vite)
 
 A interface web fica na pasta `frontend/` e consome as duas APIs do backend:
@@ -1514,13 +1470,6 @@ Acesse:
 
 ```text
 http://localhost:5173
-```
-
-As URLs da API ficam em `frontend/.env` (modelo em `frontend/.env.example`):
-
-```env
-VITE_API_URL=http://localhost:3000/api
-VITE_GRAPHQL_URL=http://localhost:3000/graphql
 ```
 
 ## Telas
