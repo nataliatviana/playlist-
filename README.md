@@ -1459,6 +1459,7 @@ Verifique:
 3. Se a connection string está correta.
 4. Se o IP do computador está cadastrado no **IP Access List**.
 5. Se o arquivo `.env` está configurado corretamente.
+6. Se você está em uma **rede corporativa**: firewalls com inspeção SSL podem bloquear a porta `27017` ou fazer o tráfego sair por outro IP público. Nesse caso, peça a liberação da porta `27017` para `*.mongodb.net` (sem inspeção TLS) ou use **Allow Access from Anywhere (`0.0.0.0/0`)** no Network Access do Atlas.
 
 ---
 
@@ -1481,6 +1482,79 @@ Depois:
 
 ```bash
 npm run dev
+```
+
+---
+
+# 🎨 Frontend (React + Vite)
+
+A interface web fica na pasta `frontend/` e consome as duas APIs do backend:
+
+| Recurso | Integração |
+|---|---|
+| Login, cadastro e sessão | REST — `/api/auth/login`, `/api/auth/register`, `/api/auth/me` |
+| Buscar músicas e filtrar por gênero | REST — `GET /api/songs?search=&genre=`, `GET /api/genres` |
+| Início, playlists, colaboradores, favoritas e avaliações | GraphQL (Apollo Client) — `/graphql` |
+
+O token JWT recebido no login é salvo no navegador e enviado no cabeçalho `Authorization: Bearer <token>` de todas as requisições. As telas internas só abrem para usuários autenticados.
+
+> 🎧 O player do rodapé é **apenas ilustrativo**: nenhuma música é reproduzida (streaming está fora do escopo do projeto).
+
+## Executar o frontend
+
+Com o backend já rodando na porta `3000`, em outro terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Acesse:
+
+```text
+http://localhost:5173
+```
+
+As URLs da API ficam em `frontend/.env` (modelo em `frontend/.env.example`):
+
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_GRAPHQL_URL=http://localhost:3000/graphql
+```
+
+## Telas
+
+| Rota | Tela |
+|---|---|
+| `/login` | Login |
+| `/cadastro` | Cadastro de usuário |
+| `/` | Início — resumo do usuário, suas playlists e músicas do catálogo |
+| `/buscar` | Pesquisa de músicas com filtro por gênero; favoritar, avaliar e adicionar à playlist |
+| `/favoritas` | Músicas favoritadas pelo usuário |
+| `/playlist/:id` | Detalhes da playlist — editar, excluir, remover músicas e gerenciar colaboradores |
+
+A interface é responsiva: no computador a navegação fica na barra lateral; no celular, em uma barra inferior.
+
+## Playlist colaborativa
+
+1. O dono cria (ou edita) a playlist com visibilidade **Colaborativa**.
+2. O dono abre a playlist e clica no ícone de **colaboradores**.
+3. Informa o ID do usuário colaborador (a mutation `adicionarColaborador` recebe `userId`).
+4. A partir daí, o colaborador vê a playlist na biblioteca e pode adicionar e remover músicas.
+
+## Estrutura do frontend
+
+```text
+frontend/src/
+├── components/   # Sidebar, PlayerBar, TrackList, PlaylistForm, AddToPlaylist...
+├── context/      # AuthContext (sessão JWT), PlayerContext, ToastContext
+├── graphql/      # queries.js e mutations.js
+├── hooks/        # useFavorites, useRatings
+├── layouts/      # AppLayout (sidebar + conteúdo + player)
+├── pages/        # Login, Register, Home, Search, Favorites, PlaylistDetail
+├── services/     # apollo.js (GraphQL), api.js (REST), token.js
+└── utils/        # formatação de duração, normalização de dados
 ```
 
 ---
