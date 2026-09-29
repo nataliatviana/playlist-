@@ -24,6 +24,7 @@ function PlaylistDetail() {
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [showCollaborators, setShowCollaborators] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { data, loading, error } = useQuery(GET_PLAYLIST, { variables: { id } });
   const refetchQueries = [
@@ -68,7 +69,6 @@ function PlaylistDetail() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`Deseja realmente excluir a playlist "${playlist.name}"?`)) return;
     try {
       await excluirPlaylist({ variables: { id: playlist.id } });
       showToast("Playlist excluída.");
@@ -149,7 +149,7 @@ function PlaylistDetail() {
             <button
               type="button"
               className="icon-button bordered danger"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteModal(true)}
               aria-label="Excluir playlist"
               title="Excluir playlist"
             >
@@ -179,6 +179,45 @@ function PlaylistDetail() {
       )}
 
       {editing && <PlaylistForm playlist={playlist} onClose={() => setEditing(false)} />}
+
+      {showDeleteModal && (
+          <div className="modal-backdrop" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal" onClick={(event) => event.stopPropagation()}>
+          <div className="delete-modal-icon">
+            <TrashIcon size={24} />
+          </div>
+
+          <h2>Excluir playlist?</h2>
+
+          <p>
+            Tem certeza que deseja excluir a playlist{" "}
+            <strong>"{playlist.name}"</strong>?
+          </p>
+
+          <p className="delete-modal-warning">
+            Essa ação não poderá ser desfeita.
+          </p>
+
+          <div className="delete-modal-actions">
+            <button
+              type="button"
+              className="button secondary"
+              onClick={() => setShowDeleteModal(false)}
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              className="button danger"
+              onClick={handleDelete}
+            >
+              Excluir playlist
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }

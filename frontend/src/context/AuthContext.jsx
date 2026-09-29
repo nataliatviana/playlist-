@@ -37,9 +37,8 @@ export function AuthProvider({ children }) {
   const register = useCallback(
     async (name, email, password) => {
       await authApi.register(name, email, password);
-      await login(email, password);
     },
-    [login]
+    []
   );
 
   const value = useMemo(

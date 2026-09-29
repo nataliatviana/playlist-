@@ -31,8 +31,8 @@ function Register() {
     setLoading(true);
     try {
       await register(form.name.trim(), form.email.trim(), form.password);
-      navigate("/", { replace: true });
-    } catch (err) {
+      navigate("/login", { replace: true });    }
+      catch (err) {
       setError(errorMessage(err));
     } finally {
       setLoading(false);
